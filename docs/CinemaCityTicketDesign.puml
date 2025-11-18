@@ -1,0 +1,161 @@
+@startuml Domain Model
+
+package Domain {
+    package "Configuration" {
+        class LateShowSetting <<Value>> {
+            lateShowStartTime
+            isLateShow(time): boolean
+        }
+        note bottom of LateShowSetting
+            レイトショーの境界定義
+            (例: 20:00以降。境界値(=)を含む)
+        end note
+
+        interface LateShowSettingRepository
+        LateShowSettingRepository .u.> LateShowSetting : create
+    }
+
+    package Customer {
+        interface CustomerClassification <<Entity>> {
+            id
+            label
+        }
+        note bottom of CustomerClassification
+            運営により変動可能。
+            (シネマシティズン, 一般, etc.)
+        end note
+    }
+
+    package "Calendar" as CalendarPkg {
+        class Calendar <<Value>> {
+            isWeekend(DateTime): boolean
+            isRegularDay(DateTime): boolean
+            isMovieDay(DateTime): boolean
+            isHoliday(DateTime): boolean
+        }
+
+        note top of Calendar
+            特定期間(例:1ヶ月)の祝日情報などを
+            オンメモリで保持する値オブジェクト
+        end note
+
+        interface CalendarRepository <<Repository>>
+
+        CalendarRepository .u.> Calendar : create
+        note left of CalendarRepository
+            祝日情報/映画の日は外部サービス/DB等から取得して
+            Calendar(Value)を生成する
+        end note
+    }
+
+
+    package "Ticket" as TicketPkg {
+        interface ScreeningAttribute <<Entity>> {
+            id
+            label
+        }
+
+        class Ticket <<Entity>> {
+            id
+            theaterId
+            movieStartAt: DateTime
+            attributes: Set<ScreeningAttribute>
+        }
+
+        Ticket o--> "1..n" ScreeningAttribute : has characteristics
+
+        note right of Ticket
+            上映回ごとに「極上爆音」「特別興行」
+            などの属性を付与できる構造にする
+        end note
+        note bottom of ScreeningAttribute
+            「爆音上映」「IMAX」など、上映形式の属性
+            運営によって変動可能
+        end note
+
+        interface TicketRepository {
+            find(theaterId, DateTime): Either<Exception, Ticket>
+        }
+        TicketRepository .u.> Ticket : create
+    }
+
+    package "Pricing" {
+        class Price <<Value>>
+
+        class PricingInput <<Value>> {
+            customer: CustomerClassification
+            ticket: Ticket
+            calendar: Calendar
+            lateShowSetting: LateShowSetting
+        }
+
+        interface PricingRule {
+            calculate(PricingInput): Price
+            isApplicable(PricingInput): boolean
+        }
+
+        note left of PricingRule
+            具体的なルールはアプリケーションレベルで定義
+            「シネマシティズンの場合、映画の日より平日を優先」といった
+            個別ルール依存の判定は、
+            ドメインロジックではなく個別のルールが持つ
+        end note
+    }
+
+    PricingInput o--> CustomerClassification
+    PricingInput o--> Ticket
+    PricingInput o--> Calendar
+    PricingInput o--> LateShowSetting
+
+    PricingRule ..> PricingInput : input
+    PricingRule .> Price : returns
+}
+
+package Infrastructure {
+    package StaticConfig {
+        CalendarRepository <|... StaticCalendarRepository
+        LateShowSettingRepository <|.. StaticLateShowSettingRepository
+        TicketRepository <|.. StaticTicketRepository
+    }
+}
+
+package Application {
+    package PricingDefinition {
+        RegularPricingRule ..|> PricingRule : 一般
+        Regular ..|> CustomerClassification
+        RegularPricingRule --> Regular
+
+        CinemaCitizenPricingRule ..|> PricingRule : シネマシティズン
+        CinemaCitizen ..|> CustomerClassification
+        CinemaCitizenPricingRule --> CinemaCitizen
+
+        CinemaCitizenSeniorPricingRule ..|> PricingRule : シネマシティズン（60歳以上）
+        CinemaCitizenSenior ..|> CustomerClassification
+        CinemaCitizenSeniorPricingRule --> CinemaCitizenSenior
+
+        note bottom of CinemaCitizenPricingRule
+            映画の日であっても、平日の場合は平日料金を優先
+        end note
+    }
+    note top of PricingDefinition
+        アプリケーションとして提供する
+        区分
+        区分ごとの金額計算ルール
+        を定義する
+    end note
+
+    package Service {
+        class ListCustomerClassifications {
+            run(): Set<CustomerClassification>
+        }
+
+        class CalculateTicketPrice {
+            run(CustomerClassification, DateTime, theaterId): Either<Exception, Price>
+        }
+    }
+    note top of Service
+        アプリケーションとして提供する機能
+    end note
+}
+
+@enduml

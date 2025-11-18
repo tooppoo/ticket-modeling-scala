@@ -1,0 +1,117 @@
+@startuml Domain Model
+
+package "Utils" as lang {
+    class DateTime
+}
+
+package "Configuration" {
+    class LateShowSetting <<Value>> {
+        lateShowStartTime
+        isLateShow(time): boolean
+    }
+    note bottom of LateShowSetting
+        レイトショーの境界定義
+        (例: 20:00以降。境界値(=)を含む)
+    end note
+}
+
+package Customer {
+    interface CustomerClassification <<Entity>> {
+        id
+        label
+    }
+    note bottom of CustomerClassification
+        運営により変動可能。
+        (シネマシティズン, 一般, etc.)
+    end note
+}
+
+package "Calendar" as CalendarPkg {
+    class Calendar <<Value>> {
+        isWeekend(DateTime): boolean
+        isRegularDay(DateTime): boolean
+        isMovieDay(DateTime): boolean
+        isHoliday(DateTime): boolean
+    }
+    Calendar ..> DateTime
+
+    note bottom of Calendar
+        特定期間(例:1ヶ月)の祝日情報などを
+        オンメモリで保持する値オブジェクト
+    end note
+}
+
+package "External Services" {
+    interface CalendarRepository <<Repository>>
+
+    CalendarRepository ...> Calendar : create
+    note top of CalendarRepository
+        祝日情報/映画の日は外部サービス/DB等から取得して
+        Calendar(Value)を生成する
+    end note
+}
+
+package "Ticket Context" {
+    interface ScreeningAttribute <<Entity>> {
+        id
+        label
+    }
+
+    class Ticket <<Entity>> {
+        id
+        theaterId
+        movieStartAt
+        attributes: Set<ScreeningAttribute>
+    }
+    
+    class Theater <<Entity>> {
+        id
+        name
+    }
+    
+    Ticket --> Theater
+    Ticket o--> DateTime : as movieStartAt
+    Ticket o--> "1..n" ScreeningAttribute : has characteristics
+    
+    note right of Ticket
+        上映回ごとに「極上爆音」「特別興行」
+        などの属性を付与できる構造にする
+    end note
+    note bottom of ScreeningAttribute
+        「爆音上映」「IMAX」など、上映形式の属性
+        運営によって変動可能
+    end note
+}
+
+package "Pricing Logic" {
+    class Price <<Value>>
+
+    class PricingInput <<Value>> {
+        customer: CustomerClassification
+        ticket: Ticket
+        calendar: Calendar
+        lateShowSetting: LateShowSetting
+    }
+    
+    interface PricingRule {
+        calculate(PricingInput): Price
+        isApplicable(PricingInput): boolean
+    }
+    
+    note top of PricingRule
+        具体的なルールはアプリケーションレベルで定義
+        「シネマシティズンの場合、映画の日より平日を優先」といった
+        個別ルール依存の判定は、
+        ドメインロジックではなく個別のルールが持つ
+    end note
+}
+
+PricingInput o--> CustomerClassification
+PricingInput o--> Ticket
+PricingInput o--> Calendar
+PricingInput o--> LateShowSetting
+
+PricingRule ..> PricingInput : input
+PricingRule .> Price : returns
+
+@enduml

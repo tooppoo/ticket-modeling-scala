@@ -1,14 +1,13 @@
 package org.philomagi.ticket_modeling
 package application.service
 
+import application.PriceDefinition
 import domain.calendar.CalendarRepository
 import domain.configuration.LateShowSettingRepository
 import domain.customer.CustomerClassification
+import domain.pricing.{Price, PricingInput}
 import domain.theater.Theater
 import domain.ticket.TicketRepository
-
-import org.philomagi.ticket_modeling.application.PriceDefinition
-import org.philomagi.ticket_modeling.domain.pricing.{Price, PricingInput}
 
 import java.time.LocalDateTime
 

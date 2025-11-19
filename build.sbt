@@ -7,3 +7,6 @@ lazy val root = (project in file("."))
     name := "ticket-modeling",
     idePackagePrefix := Some("org.philomagi.ticket_modeling")
   )
+
+libraryDependencies ++= Seq(
+)

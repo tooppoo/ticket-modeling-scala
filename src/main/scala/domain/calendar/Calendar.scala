@@ -11,15 +11,10 @@ class Calendar(
     if (isMovieDay(dt)) Calendar.MovieDay(dt)
     else if (isHoliday(dt)) Calendar.Holiday(dt)
     else if (isWeekEnd(dt)) Calendar.WeekEnd(dt)
-    else if (isRegularDay(dt)) Calendar.RegularDay(dt)
-    else throw new RuntimeException(s"Could not match any pattern: $dt")
+    else Calendar.RegularDay(dt)
   }
 
-  def isRegularDay(dt: LocalDateTime): Boolean = {
-    !isHoliday(dt)
-    && dt.getDayOfWeek != DayOfWeek.SATURDAY
-    && dt.getDayOfWeek != DayOfWeek.SUNDAY
-  }
+  def isRegularDay(dt: LocalDateTime): Boolean = !isHoliday(dt) && !isWeekEnd(dt)
 
   def isWeekEnd(dt: LocalDateTime): Boolean =
     dt.getDayOfWeek == DayOfWeek.SATURDAY

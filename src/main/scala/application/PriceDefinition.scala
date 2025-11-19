@@ -11,6 +11,18 @@ object PriceDefinition {
   // シネマシティ チケット料金の区分定義
   // 出典: docs/CinemaCityTicketPricing.md
 
+  def matchPricingRule(classification: CustomerClassification): PricingRule = classification match {
+    case CinemaCitizen => CinemaCitizenPricingRule
+    case CinemaCitizenSenior => CinemaCitizenSeniorPricingRule
+    case Regular => RegularPricingRule
+    case Senior70Plus => Senior70PlusPricingRule
+    case CollegeStudent => CollegeStudentPricingRule
+    case MiddleHighStudent => MiddleHighStudentPricingRule
+    case ChildOrElementary => ChildOrElementaryPricingRule
+    case DisabledStudentOrAbove => DisabledStudentOrAbovePricingRule
+    case CompanionOfDisabledStudentOrAbove => CompanionOfDisabledStudentOrAbovePricingRule
+  }
+
   // シネマシティズン
   case object CinemaCitizen extends CustomerClassification {
     val id: String @@ "CustomerClassificationId" = TaggedType("CinemaCitizen")
@@ -166,20 +178,6 @@ object PriceDefinition {
     }
   }
 
-  def list = Seq(
-    CinemaCitizen,
-    CinemaCitizenSenior,
-    Regular,
-    Senior70Plus,
-    CollegeStudent,
-    MiddleHighStudent,
-    ChildOrElementary,
-    DisabledStudentOrAbove,
-    DisabledUnderHighSchool,
-    CompanionOfDisabledStudentOrAbove,
-    CompanionOfDisabledUnderHighSchool,
-  )
-  
   class InvalidCustomerClassificationException(customerClassification: CustomerClassification)
     extends Exception(s"Invalid customer classification: ${customerClassification.id}")
 }

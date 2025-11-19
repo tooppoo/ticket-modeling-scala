@@ -6,10 +6,10 @@ import domain.theater.Theater
 import java.time.LocalDateTime
 
 class Ticket(
-              private val id: Ticket.Id,
-              private val theaterId: Theater.Id,
-              private val movieStartAt: LocalDateTime,
-              private val screeningAttributes: Seq[Ticket.ScreeningAttribute]
+              val id: Ticket.Id,
+              val theaterId: Theater.Id,
+              val movieStartAt: LocalDateTime,
+              val screeningAttributes: Seq[Ticket.ScreeningAttribute]
             )
 object Ticket {
   import utils.TaggedType.*

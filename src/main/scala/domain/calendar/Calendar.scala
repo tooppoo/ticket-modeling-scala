@@ -6,6 +6,15 @@ import java.time.{DayOfWeek, LocalDateTime}
 class Calendar(
                 private val holidays: Set[LocalDateTime]
               ) {
+  def matchDateType(dt: LocalDateTime): Calendar.DateType = {
+    // 優先順位: 映画の日 > 祝日 > 週末 > 平日
+    if (isMovieDay(dt)) Calendar.MovieDay(dt)
+    else if (isHoliday(dt)) Calendar.Holiday(dt)
+    else if (isWeekEnd(dt)) Calendar.WeekEnd(dt)
+    else if (isRegularDay(dt)) Calendar.RegularDay(dt)
+    else throw new RuntimeException(s"Could not match any pattern: $dt")
+  }
+
   def isRegularDay(dt: LocalDateTime): Boolean = {
     !isHoliday(dt)
     && dt.getDayOfWeek != DayOfWeek.SATURDAY
@@ -23,4 +32,14 @@ class Calendar(
   extension(dt: LocalDateTime) {
     private def isSameDate(other: LocalDateTime): Boolean = dt.toLocalDate == other.toLocalDate
   }
+}
+object Calendar {
+  trait DateType {
+    val dateTime: LocalDateTime
+  }
+
+  case class RegularDay(dateTime: LocalDateTime) extends DateType
+  case class WeekEnd(dateTime: LocalDateTime) extends DateType
+  case class MovieDay(dateTime: LocalDateTime) extends DateType
+  case class Holiday(dateTime: LocalDateTime) extends DateType
 }

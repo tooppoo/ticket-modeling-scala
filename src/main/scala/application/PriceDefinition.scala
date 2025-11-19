@@ -27,7 +27,7 @@ object PriceDefinition {
   case object CinemaCitizen extends CustomerClassification {
     val id: String @@ "CustomerClassificationId" = TaggedType("CinemaCitizen")
   }
-  case object CinemaCitizenPricingRule extends PricingRule {
+  private case object CinemaCitizenPricingRule extends PricingRule {
     override def calculate(input: PricingInput): Either[Exception, Price] = input.customerClassification match {
       case CinemaCitizen => input.calendar.matchDateType(input.ticket.movieStartAt) match {
         case Calendar.RegularDay(_) => Right(Price(1000))
@@ -60,7 +60,7 @@ object PriceDefinition {
   case object CinemaCitizenSenior extends CustomerClassification {
     val id: String @@ "CustomerClassificationId" = TaggedType("CinemaCitizenSenior")
   }
-  case object CinemaCitizenSeniorPricingRule extends PricingRule {
+  private case object CinemaCitizenSeniorPricingRule extends PricingRule {
     override def calculate(input: PricingInput): Either[Exception, Price] = input.customerClassification match {
       case CinemaCitizenSenior => Right(Price(1000))
       case _ => Left(new InvalidCustomerClassificationException(input.customerClassification))
@@ -71,7 +71,7 @@ object PriceDefinition {
   case object Regular extends CustomerClassification {
     val id: String @@ "CustomerClassificationId" = TaggedType("Regular")
   }
-  case object RegularPricingRule extends PricingRule {
+  private case object RegularPricingRule extends PricingRule {
     override def calculate(input: PricingInput): Either[Exception, Price] = input.customerClassification match {
       case Regular => input.calendar.matchDateType(input.ticket.movieStartAt) match {
         case Calendar.RegularDay(dateTime) if input.lateShowSetting.isLateShow(dateTime) => Right(Price(1500))
@@ -93,7 +93,7 @@ object PriceDefinition {
   case object Senior70Plus extends CustomerClassification {
     val id: String @@ "CustomerClassificationId" = TaggedType("Senior70Plus")
   }
-  case object Senior70PlusPricingRule extends PricingRule {
+  private case object Senior70PlusPricingRule extends PricingRule {
     override def calculate(input: PricingInput): Either[Exception, Price] = input.customerClassification match {
       case Senior70Plus => Right(Price(1300))
       case _ => Left(new InvalidCustomerClassificationException(input.customerClassification))
@@ -104,7 +104,7 @@ object PriceDefinition {
   case object CollegeStudent extends CustomerClassification {
     val id: String @@ "CustomerClassificationId" = TaggedType("CollegeStudent")
   }
-  case object CollegeStudentPricingRule extends PricingRule {
+  private case object CollegeStudentPricingRule extends PricingRule {
     override def calculate(input: PricingInput): Either[Exception, Price] = input.customerClassification match {
       case CollegeStudent => input.calendar.matchDateType(input.ticket.movieStartAt) match {
         case Calendar.MovieDay(_) => Right(Price(1300))
@@ -118,7 +118,7 @@ object PriceDefinition {
   case object MiddleHighStudent extends CustomerClassification {
     val id: String @@ "CustomerClassificationId" = TaggedType("MiddleHighStudent")
   }
-  case object MiddleHighStudentPricingRule extends PricingRule {
+  private case object MiddleHighStudentPricingRule extends PricingRule {
     override def calculate(input: PricingInput): Either[Exception, Price] = input.customerClassification match {
       case MiddleHighStudent => Right(Price(1000))
       case _ => Left(new InvalidCustomerClassificationException(input.customerClassification))
@@ -129,7 +129,7 @@ object PriceDefinition {
   case object ChildOrElementary extends CustomerClassification {
     val id: String @@ "CustomerClassificationId" = TaggedType("ChildOrElementary")
   }
-  case object ChildOrElementaryPricingRule extends PricingRule {
+  private case object ChildOrElementaryPricingRule extends PricingRule {
     override def calculate(input: PricingInput): Either[Exception, Price] = input.customerClassification match {
       case ChildOrElementary => Right(Price(1000))
       case _ => Left(new InvalidCustomerClassificationException(input.customerClassification))
@@ -140,7 +140,7 @@ object PriceDefinition {
   case object DisabledStudentOrAbove extends CustomerClassification {
     val id: String @@ "CustomerClassificationId" = TaggedType("DisabledStudentOrAbove")
   }
-  case object DisabledStudentOrAbovePricingRule extends PricingRule {
+  private case object DisabledStudentOrAbovePricingRule extends PricingRule {
     override def calculate(input: PricingInput): Either[Exception, Price] = input.customerClassification match {
       case DisabledStudentOrAbove => Right(Price(1000))
       case _ => Left(new InvalidCustomerClassificationException(input.customerClassification))
@@ -150,7 +150,7 @@ object PriceDefinition {
   case object CompanionOfDisabledStudentOrAbove extends CustomerClassification {
     val id: String @@ "CustomerClassificationId" = TaggedType("CompanionOfDisabledStudentOrAbove")
   }
-  case object CompanionOfDisabledStudentOrAbovePricingRule extends PricingRule {
+  private case object CompanionOfDisabledStudentOrAbovePricingRule extends PricingRule {
     override def calculate(input: PricingInput): Either[Exception, Price] = input.customerClassification match {
       case CompanionOfDisabledStudentOrAbove => Right(Price(1000))
       case _ => Left(new InvalidCustomerClassificationException(input.customerClassification))
@@ -161,7 +161,7 @@ object PriceDefinition {
   case object DisabledUnderHighSchool extends CustomerClassification {
     val id: String @@ "CustomerClassificationId" = TaggedType("DisabledHighOrBelow")
   }
-  case object DisabledUnderHighSchoolPricingRule extends PricingRule {
+  private case object DisabledUnderHighSchoolPricingRule extends PricingRule {
     override def calculate(input: PricingInput): Either[Exception, Price] = input.customerClassification match {
       case DisabledUnderHighSchool => Right(Price(900))
       case _ => Left(new InvalidCustomerClassificationException(input.customerClassification))
@@ -171,7 +171,7 @@ object PriceDefinition {
   case object CompanionOfDisabledUnderHighSchool extends CustomerClassification {
     val id: String @@ "CustomerClassificationId" = TaggedType("CompanionOfDisabledHighOrBelow")
   }
-  case object CompanionOfDisabledUnderHighSchoolPricingRule extends PricingRule {
+  private case object CompanionOfDisabledUnderHighSchoolPricingRule extends PricingRule {
     override def calculate(input: PricingInput): Either[Exception, Price] = input.customerClassification match {
       case CompanionOfDisabledUnderHighSchool => Right(Price(900))
       case _ => Left(new InvalidCustomerClassificationException(input.customerClassification))

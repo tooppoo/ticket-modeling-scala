@@ -20,7 +20,9 @@ object PriceDefinition {
     case MiddleHighStudent => MiddleHighStudentPricingRule
     case ChildOrElementary => ChildOrElementaryPricingRule
     case DisabledStudentOrAbove => DisabledStudentOrAbovePricingRule
+    case DisabledUnderHighSchool => DisabledUnderHighSchoolPricingRule
     case CompanionOfDisabledStudentOrAbove => CompanionOfDisabledStudentOrAbovePricingRule
+    case CompanionOfDisabledUnderHighSchool => CompanionOfDisabledUnderHighSchoolPricingRule
   }
 
   // シネマシティズン

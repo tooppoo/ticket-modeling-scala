@@ -1,4 +1,4 @@
-@startuml Domain Model
+@startuml Design
 
 package Domain {
     package "Configuration" {
